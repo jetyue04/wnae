@@ -26,7 +26,7 @@ spec:
               python -m pip install numpy==1.23.5
               python -m pip install scipy==1.13.1
               # run the script
-              python -u train_axo.py | tee wnae_training_5_4.log
+              python -u train_axo.py | tee wnae_training_10_14.log
 
           resources:
             requests:

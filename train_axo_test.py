@@ -1,3 +1,4 @@
+
 # Loading the data from the processed files :)
 import json
 import numpy as np
@@ -75,7 +76,7 @@ loaders = MyLoader(train_loader, val_loader, val_loader_no_batch, sig_loader)
 
 config = import_module("example.config")
 config.training_params["batch_size"] = batch_size
-config.training_params['n_epochs'] = 33
+config.training_params['n_epochs'] = 1
 
 input_size = x_train.shape[-1]
 intermediate_architecture_encoder = (28,15)
