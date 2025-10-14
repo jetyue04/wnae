@@ -24,9 +24,9 @@ batch_size = 2048
 #f = h5.File('/axovol/training/v5/conditionsupdate_apr25.h5', 'r')
 f = h5py.File('../training/v5/conditionsupdate_apr25.h5', 'r')
 
-x_train = f['data']["Background_data"]["Train"]["DATA"][:]
-x_test = f['data']["Background_data"]["Test"]["DATA"][:]
-x_sig = f['data']["Signal_data"]["GluGluHToBB_M-125"]["DATA"][:]
+x_train = f['data']["Background_data"]["Train"]["DATA"][:1000]
+x_test = f['data']["Background_data"]["Test"]["DATA"][:1000]
+x_sig = f['data']["Signal_data"]["GluGluHToBB_M-125"]["DATA"][:1000]
 
 scale = f['data']["Normalisation"]["norm_scale"][:]
 bias = f['data']["Normalisation"]["norm_bias"][:]
@@ -82,7 +82,7 @@ intermediate_architecture_encoder = (28,15)
 # intermediate_architecture_decoder = (24, 32, 64, 128, 57)
 intermediate_architecture_decoder = (57, 128, 64, 32, 24)
 bottleneck_size = 8
-output_path = "output_10_14"
+output_path = "output_test_10_14"
 # output_path = "~/Desktop"
 
 if os.path.exists(output_path) and os.path.isdir(output_path):
