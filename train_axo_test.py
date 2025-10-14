@@ -23,7 +23,7 @@ batch_size = 2048
 # f = h5py.File("./data/newdata/Data.h5","r")
 #f = h5py.File("/pfvolcentral/notebooks/btagging/Data.h5","r")
 #f = h5.File('/axovol/training/v5/conditionsupdate_apr25.h5', 'r')
-f = h5py.File('../../training/v5/conditionsupdate_apr25.h5', 'r')
+f = h5py.File('..//training/v5/conditionsupdate_apr25.h5', 'r')
 
 x_train = f['data']["Background_data"]["Train"]["DATA"][:]
 x_test = f['data']["Background_data"]["Test"]["DATA"][:]
