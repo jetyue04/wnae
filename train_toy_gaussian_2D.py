@@ -1,15 +1,23 @@
-import torch
-from torch.utils import data
+import json
 import numpy as np
-from importlib import import_module
+from torch.utils import data
+import h5py
+import torch
+from example.trainer import TrainerWassersteinNormalizedAutoEncoder
+from example.loader import Loader
+from example.architectures import Encoder, Decoder
+from wnae._logger import log
+from pathlib import Path
+import os
+import shutil
 
 # Device
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Dataset parameters
-n_train = 100000
-n_test = 10000
-n_ood = 100000
+n_train = 1000000
+n_test = 100000
+n_ood = 1000000
 D = 2     # number of dimensions
 N = 3       # scaling factor for correlated features
 noise_std = 0.4
@@ -67,7 +75,7 @@ input_size = x_train.shape[-1]
 intermediate_architecture_encoder = (28,15)
 intermediate_architecture_decoder = (57, 128, 64, 32, 24)
 bottleneck_size = 8
-output_path = "./toy_test"
+output_path = "./toy_test2D"
 
 encoder = Encoder(
     input_size=input_size,
