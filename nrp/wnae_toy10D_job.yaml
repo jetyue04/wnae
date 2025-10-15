@@ -26,7 +26,7 @@ spec:
               python -m pip install numpy==1.23.5
               python -m pip install scipy==1.13.1
               # run the script
-              python -u train_axo.py | tee wnae_training_10_14.log
+              python -u train_toy_gaussian_10D.py | tee wnae_training_toy10D.log
 
           resources:
             requests:
