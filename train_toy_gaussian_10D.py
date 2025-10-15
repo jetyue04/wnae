@@ -77,7 +77,7 @@ input_size = x_train.shape[-1]
 intermediate_architecture_encoder = (28,15)
 intermediate_architecture_decoder = (57, 128, 64, 32, 24)
 bottleneck_size = 8
-output_path = "./toy_test2D"
+output_path = "./toy_test10D"
 
 encoder = Encoder(
     input_size=input_size,
