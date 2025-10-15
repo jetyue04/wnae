@@ -10,6 +10,7 @@ from wnae._logger import log
 from pathlib import Path
 import os
 import shutil
+from importlib import import_module
 
 
 # Device
@@ -70,7 +71,7 @@ config = import_module("example.config")
 
 # config.training_params["learning_rate"]
 config.training_params["batch_size"] = batch_size
-config.training_params['n_epochs'] = 5
+config.training_params['n_epochs'] = 500
 
 input_size = x_train.shape[-1]
 intermediate_architecture_encoder = (28,15)

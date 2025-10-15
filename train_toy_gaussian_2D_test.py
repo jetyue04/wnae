@@ -10,6 +10,7 @@ from wnae._logger import log
 from pathlib import Path
 import os
 import shutil
+from importlib import import_module
 
 # Device
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
