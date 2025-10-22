@@ -295,24 +295,24 @@ class TrainerWassersteinNormalizedAutoEncoder():
 
         optimizer_args = {
             "params": self.model.parameters(),
-            "lr": self.config.training_params["learning_rate"],
+            "lr": self.config.training["learning_rate"],
         }
         torch_optimizer = getattr(torch.optim, self.config.training_params["optimizer"])
         optimizer = torch_optimizer(**optimizer_args)
         
-        if self.config.training_params["lr_scheduler"] is not None:
-            lr_scheduler = getattr(torch.optim.lr_scheduler, self.config.training_params["lr_scheduler"])(
+        if self.config.training["lr_scheduler"] is not None:
+            lr_scheduler = getattr(torch.optim.lr_scheduler, self.config.training["lr_scheduler"])(
                 optimizer,
-                **self.config.training_params["lr_scheduler_args"]
+                **self.config.training["lr_scheduler_args"]
             )
         else:
             lr_scheduler = None
 
         self.__fit(
-            n_epochs=self.config.training_params["n_epochs"],
+            n_epochs=self.config.training["n_epochs"],
             optimizer=optimizer,
             lr_scheduler=lr_scheduler,
-            es_patience=self.config.training_params["es_patience"],
+            es_patience=self.config.training["es_patience"],
         )
 
         log.info("Finished training")
@@ -326,7 +326,7 @@ class TrainerWassersteinNormalizedAutoEncoder():
         model = WNAE(
             encoder=self.encoder,
             decoder=self.decoder,
-            **self.config.training_params["wnae_parameters"],
+            **self.config["wnae"],
         )
         model.to(self.device)
         return model
