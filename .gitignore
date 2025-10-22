@@ -4,6 +4,7 @@
 __pycache__/
 *.py[cod]
 *.so
+*.pyc
 
 # ------------------------
 # Jupyter Notebook checkpoints
@@ -15,9 +16,11 @@ __pycache__/
 # ------------------------
 output_*/
 outputs_toy*/
-temp_test/
 toy_test*/
 wnae_training*.log
+output_full_*/
+output_test_*/
+temp_test*/
 
 # ------------------------
 # Configuration / local files
