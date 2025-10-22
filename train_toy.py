@@ -2,17 +2,13 @@ import os
 import json
 import yaml
 import torch
-import h5py
-import shutil
 import argparse
 import numpy as np
 from pathlib import Path
 from torch.utils import data
-from importlib import import_module
 from example.trainer import TrainerWassersteinNormalizedAutoEncoder
 from example.architectures import Encoder, Decoder
 from wnae._logger import log
-
 
 # ------------------------
 # Helper functions
@@ -25,7 +21,6 @@ def load_config(config_path, overrides=None):
 
     if overrides:
         for key, value in overrides.items():
-            # Handle nested override like "train.batch_size=512"
             keys = key.split(".")
             sub = config
             for k in keys[:-1]:
@@ -33,39 +28,45 @@ def load_config(config_path, overrides=None):
             sub[keys[-1]] = value
     return config
 
-
 def prepare_dataloaders(data_config, device):
-    """Load and prepare datasets."""
-    f = h5py.File(data_config["filepath"], "r")
+    """Generate toy dataset from config and prepare DataLoaders."""
 
-    n_train_sample = data_config.get("n_train_sample", 50000)
-    n_test_sample = data_config.get("n_test_sample", 20000)
-    standardize = data_config.get("standardize", False)
+    # Read parameters from config
+    n_train = data_config.get("n_train", 10000)
+    n_test = data_config.get("n_test", 1000)
+    n_ood = data_config.get("n_ood", 1000)
+    D = data_config.get("D", 10)
+    N = data_config.get("N", 3)
+    noise_std = data_config.get("noise_std", 0.4)
+    batch_size = data_config.get("batch_size", 1024)
 
-    # Load datasets
-    x_train = f["data"]["Background_data"]["Train"]["DATA"][:n_train_sample]
-    x_test = f["data"]["Background_data"]["Test"]["DATA"][:n_test_sample]
-    x_sig = f["data"]["Signal_data"]["GluGluHToBB_M-125"]["DATA"][:n_test_sample]
+    # Training data
+    x_train = np.zeros((n_train, D))
+    x_train[:, 0] = np.random.normal(0, 1, n_train)
+    for i in range(1, D):
+        x_train[:, i] = N * np.random.normal(0, 1, n_train) + np.random.normal(0, noise_std, n_train)
 
-    def to_tensor(x):
-        return torch.tensor(x.reshape(x.shape[0], -1), dtype=torch.float32, device=device)
+    # Validation data
+    x_test = np.zeros((n_test, D))
+    x_test[:, 0] = np.random.normal(0, 1, n_test)
+    for i in range(1, D):
+        x_test[:, i] = N * np.random.normal(0, 1, n_test) + np.random.normal(0, noise_std, n_test)
 
-    x_train, x_test, x_sig = map(to_tensor, (x_train, x_test, x_sig))
+    # OOD data / signal
+    x_sig = np.zeros((n_ood, D))
+    x_sig[:, 0] = np.random.normal(2, 1, n_ood)
+    for i in range(1, D):
+        x_sig[:, i] = N * np.random.normal(2, 1, n_ood) + np.random.normal(0, noise_std, n_ood)
 
-    if standardize:
-        mean = x_train.mean(dim=0)
-        std = x_train.std(dim=0)
-        std[std == 0] = 1.0  # prevent division by zero
+    # Convert to torch tensors
+    x_train = torch.tensor(x_train, dtype=torch.float32).to(device)
+    x_test = torch.tensor(x_test, dtype=torch.float32).to(device)
+    x_sig = torch.tensor(x_sig, dtype=torch.float32).to(device)
 
-        x_train = (x_train - mean) / std
-        x_test = (x_test - mean) / std
-        x_sig = (x_sig - mean) / std
-
-    batch_size = data_config.get("batch_size", 256)
-
-    train_loader = data.DataLoader(data.TensorDataset(x_train), batch_size=batch_size)
+    # DataLoaders
+    train_loader = data.DataLoader(data.TensorDataset(x_train), batch_size=batch_size, shuffle=True)
     val_loader = data.DataLoader(data.TensorDataset(x_test), batch_size=batch_size)
-    val_loader_no_batch = data.DataLoader(data.TensorDataset(x_test), batch_size=len(x_test))
+    val_loader_no_batch = data.DataLoader(data.TensorDataset(x_test), batch_size=len(x_train))
     sig_loader = data.DataLoader(data.TensorDataset(x_sig), batch_size=batch_size)
 
     class MyLoader:
@@ -83,7 +84,6 @@ def save_config(output_path, config):
     with open(f"{output_path}/config.json", "w") as file:
         json.dump(config, file, indent=4)
 
-
 # ------------------------
 # Main training function
 # ------------------------
@@ -100,41 +100,38 @@ def main(args):
         {**data_cfg, "batch_size": train_cfg["batch_size"]}, device
     )
 
-    # --- FIXED: Ensure Path type & handle output path increment ---
+    # Create unique output path
     output_path_base = Path(data_cfg["output"])
-    output_path = output_path_base
     counter = 1
+    output_path = output_path_base
     while output_path.exists():
         output_path = Path(f"{output_path_base}_{counter}")
         counter += 1
-
     Path(output_path).mkdir(parents=True, exist_ok=True)
     print(f"Saving outputs to {output_path}")
 
     save_config(output_path, config)
 
-    # --- Model setup ---
     encoder = Encoder(
         input_size=input_size,
         intermediate_architecture=tuple(model_cfg["encoder"]["intermediate_architecture"]),
         bottleneck_size=model_cfg["encoder"]["bottleneck_size"],
-        drop_out=model_cfg["encoder"].get("drop_out", None),
+        drop_out=model_cfg["encoder"]["drop_out"],
     )
     decoder = Decoder(
         output_size=input_size,
         intermediate_architecture=tuple(model_cfg["decoder"]["intermediate_architecture"]),
         bottleneck_size=model_cfg["decoder"]["bottleneck_size"],
-        drop_out=model_cfg["decoder"].get("drop_out", None),
+        drop_out=model_cfg["decoder"]["drop_out"],
     )
 
-    # --- Training ---
     trainer = TrainerWassersteinNormalizedAutoEncoder(
         config=config,
         loader=loaders,
         encoder=encoder,
         decoder=decoder,
         device=device,
-        output_path=str(output_path),
+        output_path=output_path,
         loss_function="wnae",
     )
 
@@ -143,22 +140,17 @@ def main(args):
     trainer.save_train_plot()
     log.info("Done.")
 
-
 # ------------------------
 # CLI Entry Point
 # ------------------------
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Train Wasserstein Normalized AutoEncoder")
+    parser = argparse.ArgumentParser(description="Train WNAE on toy dataset")
 
-    parser.add_argument(
-        "--config", type=str, default="config/config.yaml",
-        help="Path to YAML config file"
-    )
-    parser.add_argument(
-        "--override", nargs="*", default=[],
-        help='Override config, e.g. train.batch_size=1024 data.filepath="data/mydata.h5"'
-    )
+    parser.add_argument("--config", type=str, default="config/toy_config.yaml",
+                        help="Path to YAML config file")
+    parser.add_argument("--override", nargs="*", default=[],
+                        help='Override config, e.g. train.batch_size=512 model.encoder.bottleneck_size=6')
 
     args = parser.parse_args()
 
