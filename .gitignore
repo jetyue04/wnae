@@ -1,1 +1,33 @@
+# ------------------------
+# Python artifacts
+# ------------------------
+__pycache__/
+*.py[cod]
+*.so
+
+# ------------------------
+# Jupyter Notebook checkpoints
+# ------------------------
+.ipynb_checkpoints/
+
+# ------------------------
+# Output directories / logs
+# ------------------------
+output_*/
+outputs_toy*/
+temp_test/
+toy_test*/
+wnae_training*.log
+
+# ------------------------
+# Configuration / local files
+# ------------------------
+*.yaml
+*.yml
+*.json
+
+# ------------------------
+# System files
+# ------------------------
 .DS_Store
+*.swp
