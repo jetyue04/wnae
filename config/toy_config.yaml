@@ -1,0 +1,61 @@
+data:
+  output: "outputs_toy"
+  batch_size: 1024
+  standardize: false
+  filepath: null  # not used for toy dataset
+  n_train: 50000
+  n_test: 10000
+  n_ood: 10000
+  D: 10
+  N: 3
+  noise_std: 0.4
+
+training:
+  batch_size: 1024
+  n_epochs: 5
+  es_patience: 100
+  optimizer: Adam
+  learning_rate: 1e-3
+  lr_scheduler: "ReduceLROnPlateau"
+  lr_scheduler_args:
+    mode: "min"
+    factor: 0.8
+    patience: 20
+    threshold: 0.001
+    cooldown: 10
+    threshold_mode: "rel"
+    min_lr: 0
+
+wnae:
+  sampling: "pcd"
+  x_step: 25
+  x_step_size: 0.05
+  x_noise_std: 0.22
+  x_temperature: 0.063
+  x_bound: [-10, 10]
+  x_clip_grad: null
+  x_reject_boundary: false
+  x_mh: false
+  z_step: 10
+  z_step_size: 1
+  z_temperature: 0.063
+  z_noise_std: 1
+  z_bound: null
+  z_clip_grad: null
+  z_reject_boundary: false
+  z_mh: false
+  spherical: false
+  initial_dist: "gaussian"
+  replay: true
+  replay_ratio: 0.95
+  buffer_size: 10000
+
+model:
+  encoder:
+    intermediate_architecture: [16, 8]
+    bottleneck_size: 4
+    drop_out: null
+  decoder:
+    intermediate_architecture: [8, 16]
+    bottleneck_size: 4
+    drop_out: null
