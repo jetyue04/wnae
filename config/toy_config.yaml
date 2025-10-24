@@ -3,9 +3,9 @@ data:
   batch_size: 1024
   standardize: false
   filepath: null  # not used for toy dataset
-  n_train: 50000
-  n_test: 10000
-  n_ood: 10000
+  n_train: 100000
+  n_test: 12500
+  n_ood: 12500
   D: 10
   N: 3
   noise_std: 0.4

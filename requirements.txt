@@ -12,4 +12,4 @@ torch==2.1.0
 tqdm==4.67.1
 numpy==1.23.5
 scipy==1.13.1
-
+PyYAML==6.0
