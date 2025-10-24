@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: wnae-job-toy10d-standardized
+  name: wnae-job-toy2d
   namespace: axol1tl
 spec:
   template:
@@ -26,7 +26,7 @@ spec:
               python -m pip install numpy==1.23.5
               python -m pip install scipy==1.13.1
               # run the script
-              python -u train_toy.py --override data.N=1 data.D=10 training.n_epochs=500 data.output="output_toy10d_standardized"| tee wnae_toy_10d_standardized.log
+              python -u train_toy.py --override data.D=2 training.n_epochs=500 data.output="output_toy2d"| tee wnae_toy_2d.log
 
           resources:
             requests:
