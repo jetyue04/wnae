@@ -26,7 +26,7 @@ spec:
               python -m pip install numpy==1.23.5
               python -m pip install scipy==1.13.1
               # run the script
-              python -u train_toy.py --override data.N=1 data.D=2 training.n_epochs=500 | tee wnae_toy_2d_standardized.log
+              python -u train_toy.py --override data.N=1 data.D=2 training.n_epochs=500 data.output="output_toy2d_standardized"| tee wnae_toy_2d_standardized.log
 
           resources:
             requests:
