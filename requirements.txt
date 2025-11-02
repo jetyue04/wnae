@@ -13,3 +13,4 @@ tqdm==4.67.1
 numpy==1.23.5
 scipy==1.13.1
 PyYAML==6.0
+reportlab==4.2.5

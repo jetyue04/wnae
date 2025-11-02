@@ -8,6 +8,7 @@ from pathlib import Path
 from torch.utils import data
 from example.trainer import TrainerWassersteinNormalizedAutoEncoder
 from example.architectures import Encoder, Decoder
+from example.pdf_generation import create_report
 from wnae._logger import log
 
 # ------------------------
@@ -84,6 +85,8 @@ def save_config(output_path, config):
     with open(f"{output_path}/config.json", "w") as file:
         json.dump(config, file, indent=4)
 
+def generate_pdf_report(output_path, cfg, trainer):
+
 # ------------------------
 # Main training function
 # ------------------------
@@ -139,6 +142,9 @@ def main(args):
     log.info("Saving...")
     trainer.save_train_plot()
     log.info("Done.")
+
+    log.info('Creating PDF Report...')
+    create_report(output_path, config)
 
 # ------------------------
 # CLI Entry Point

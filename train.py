@@ -10,6 +10,7 @@ from pathlib import Path
 from torch.utils import data
 from importlib import import_module
 from example.trainer import TrainerWassersteinNormalizedAutoEncoder
+from example.pdf_generation import create_report
 from example.architectures import Encoder, Decoder
 from wnae._logger import log
 
@@ -142,6 +143,9 @@ def main(args):
     log.info("Saving...")
     trainer.save_train_plot()
     log.info("Done.")
+
+    log.info('Creating PDF Report...')
+    create_report(output_path, config)
 
 
 # ------------------------

@@ -1,5 +1,5 @@
 data:
-  output: "outputs_toy"
+  output: "output/outputs_toy"
   batch_size: 1024
   standardize: false
   filepath: null  # not used for toy dataset
@@ -59,3 +59,6 @@ model:
     intermediate_architecture: [8, 16]
     bottleneck_size: 4
     drop_out: null
+
+plot:
+  interval: 25
