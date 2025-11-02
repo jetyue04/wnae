@@ -85,8 +85,6 @@ def save_config(output_path, config):
     with open(f"{output_path}/config.json", "w") as file:
         json.dump(config, file, indent=4)
 
-def generate_pdf_report(output_path, cfg, trainer):
-
 # ------------------------
 # Main training function
 # ------------------------
