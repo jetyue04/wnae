@@ -64,6 +64,14 @@ def prepare_dataloaders(data_config, device):
     x_test = torch.tensor(x_test, dtype=torch.float32).to(device)
     x_sig = torch.tensor(x_sig, dtype=torch.float32).to(device)
 
+    if data_config.get("min_max", False):
+        data_min = torch.min(x_train, dim=0).values
+        data_max = torch.max(x_train, dim=0).values
+
+        x_train = (x_train - data_min) / (data_max - data_min + 1e-8)
+        x_test = (x_test - data_min) / (data_max - data_min + 1e-8)
+        x_sig = (x_sig - data_min) / (data_max - data_min + 1e-8)
+
     # DataLoaders
     train_loader = data.DataLoader(data.TensorDataset(x_train), batch_size=batch_size, shuffle=True)
     val_loader = data.DataLoader(data.TensorDataset(x_test), batch_size=batch_size)

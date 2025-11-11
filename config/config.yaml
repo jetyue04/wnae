@@ -52,4 +52,7 @@ model:
     bottleneck_size: 8
     drop_out: null
 
+plot:
+  interval: 25
+
 

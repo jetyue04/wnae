@@ -271,7 +271,7 @@ class TrainerWassersteinNormalizedAutoEncoder():
                 early_stopping_counter += 1
 
             if early_stopping_counter > es_patience:
-                early_stopped = False
+                early_stopped = True
                 log.info(f"Epoch {i_epoch}: early stopping")
                 break
 
