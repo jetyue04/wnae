@@ -1,7 +1,12 @@
+for noise in 0.1 0.4 0.8; do
+  job_name="wnae-job-toy2d-noise${noise//./}-redo"
+  output_dir="output/toy2d_noise${noise//./}_redo"
+
+  cat <<EOF | kubectl apply -f -
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: wnae-job-toy2d-standardized
+  name: ${job_name}
   namespace: axol1tl
 spec:
   template:
@@ -15,19 +20,14 @@ spec:
             - name: axovol
               mountPath: /axovol
           workingDir: /axovol/wnae_10_14
-
           command:
             - "/bin/bash"
             - "-c"
             - |
               set -e
-              # install python deps
               python -m pip install --no-cache-dir -r requirements.txt
-              python -m pip install numpy==1.23.5
-              python -m pip install scipy==1.13.1
-              # run the script
-              python -u train_toy.py --override data.N=1 data.D=2 training.n_epochs=500 data.output="output/toy2d_standardized-redo"| tee wnae_toy_2d_standardized.log
-
+              python -m pip install numpy==1.23.5 scipy==1.13.1
+              python -u train_toy.py --override data.N=1 data.D=2 data.noise_std=${noise} training.n_epochs=500 data.output="${output_dir}" | tee train_${job_name}.log
           resources:
             requests:
               cpu: "8"
@@ -41,3 +41,5 @@ spec:
         - name: axovol
           persistentVolumeClaim:
             claimName: axovol
+EOF
+done

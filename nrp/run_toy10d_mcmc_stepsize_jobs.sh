@@ -1,7 +1,18 @@
+#!/bin/bash
+
+# --- CONFIG ---
+STEP_SIZES=(0.1 0.5 1 4)
+N_STEPS=5000
+
+for step in "${STEP_SIZES[@]}"; do
+  JOB_NAME="wnae-job-toy10d-unstandardized-mcmc${step//./}"
+  OUTPUT_DIR="output/toy10d-unstandardized-mcmc${step//./}"
+
+  cat <<EOF | kubectl apply -f -
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: wnae-job-toy2d-standardized
+  name: ${JOB_NAME}
   namespace: axol1tl
 spec:
   template:
@@ -15,19 +26,20 @@ spec:
             - name: axovol
               mountPath: /axovol
           workingDir: /axovol/wnae_10_14
-
           command:
             - "/bin/bash"
             - "-c"
             - |
               set -e
-              # install python deps
               python -m pip install --no-cache-dir -r requirements.txt
-              python -m pip install numpy==1.23.5
-              python -m pip install scipy==1.13.1
-              # run the script
-              python -u train_toy.py --override data.N=1 data.D=2 training.n_epochs=500 data.output="output/toy2d_standardized-redo"| tee wnae_toy_2d_standardized.log
-
+              python -m pip install numpy==1.23.5 scipy==1.13.1
+              python -u train_toy.py --override \
+                data.N=3 \
+                data.D=10 \
+                training.n_epochs=500 \
+                data.output="${OUTPUT_DIR}" \
+                wnae.x_step_size=${step} \
+                | tee train_${JOB_NAME}.log
           resources:
             requests:
               cpu: "8"
@@ -41,3 +53,6 @@ spec:
         - name: axovol
           persistentVolumeClaim:
             claimName: axovol
+EOF
+
+done
