@@ -26,7 +26,7 @@ spec:
               python -m pip install numpy==1.23.5
               python -m pip install scipy==1.13.1
               # run the script
-              python -u train_toy.py --override data.N=3 data.D=10 training.n_epochs=500 wnae.x_step_size=0.1 data.min_max=true data.output="output/toy10d_standardized-mcmc01"| tee wnae_toy_10d_standardized.log
+              python -u train_toy.py --override data.N=3 data.D=10 training.n_epochs=500 wnae.x_step_size=0.1 data.min_max=true data.output="output/toy10d_minmax"| tee wnae_toy_10d_minmax.log
 
           resources:
             requests:
