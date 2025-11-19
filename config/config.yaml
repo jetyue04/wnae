@@ -1,6 +1,10 @@
 data:
   filepath: "../training/v5/conditionsupdate_apr25.h5"
   output: "output_full_10_21"
+  standardize: false
+  min_max: true
+  n_train_sample: 50000
+  n_test_sample: 10000
 
 training:
   batch_size: 256
@@ -28,7 +32,7 @@ wnae:
   x_clip_grad: null
   x_reject_boundary: false
   x_mh: false
-  z_step: 10
+  z_ep: 10
   z_step_size: 1
   z_temperature: 0.063
   z_noise_std: 1

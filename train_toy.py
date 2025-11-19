@@ -44,8 +44,18 @@ def prepare_dataloaders(data_config, device):
     # Training data
     x_train = np.zeros((n_train, D))
     x_train[:, 0] = np.random.normal(0, 1, n_train)
+
     for i in range(1, D):
         x_train[:, i] = N * np.random.normal(0, 1, n_train) + np.random.normal(0, noise_std, n_train)
+    if data_config.get("correlated", False):
+        correlated_idx = data_config.get("correlated_idx", [])
+        rho = 0.5                      # target correlation strength (moderate)
+        for i in correlated_idx:
+            # moderate correlation: mixture of base feature and noise
+            x_train[:, i] = (
+                rho * x_train[:, 0] +
+                (1 - rho) * np.random.normal(0, 1, n_train)
+            )
 
     # Validation data
     x_test = np.zeros((n_test, D))
