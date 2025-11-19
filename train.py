@@ -39,9 +39,10 @@ def prepare_dataloaders(data_config, device):
     """Load and prepare datasets."""
     f = h5py.File(data_config["filepath"], "r")
 
-    n_train_sample = data_config.get("n_train_sample", 50000)
+    n_train_sample = data_config.get("n_train_sample", 100000)
     n_test_sample = data_config.get("n_test_sample", 20000)
     standardize = data_config.get("standardize", False)
+    min_max = data_config.get("min_max", False)
 
     # Load datasets
     x_train = f["data"]["Background_data"]["Train"]["DATA"][:n_train_sample]
@@ -61,6 +62,14 @@ def prepare_dataloaders(data_config, device):
         x_train = (x_train - mean) / std
         x_test = (x_test - mean) / std
         x_sig = (x_sig - mean) / std
+    
+    if min_max:
+        data_min = torch.min(x_train, dim=0).values
+        data_max = torch.max(x_train, dim=0).values
+
+        x_train = (x_train - data_min) / (data_max - data_min + 1e-8)
+        x_test = (x_test - data_min) / (data_max - data_min + 1e-8)
+        x_sig = (x_sig - data_min) / (data_max - data_min + 1e-8)
 
     batch_size = data_config.get("batch_size", 256)
 

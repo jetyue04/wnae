@@ -21,6 +21,7 @@ wnae_training*.log
 output_full_*/
 output_test_*/
 temp_test*/
+output/
 
 # ------------------------
 # Configuration / local files
