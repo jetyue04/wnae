@@ -48,7 +48,10 @@ def create_report(output_dir, config):
 
     
     ## Find features and epochs
-    feature_dirs = sorted([d for d in plots_dir.iterdir() if d.is_dir() and 'feature' in d.name])
+    feature_dirs = sorted( [d for d in plots_dir.iterdir() if d.is_dir() and "feature" in d.name],
+    key=lambda d: int(re.search(r'\d+', d.name).group())
+    )
+    
     first_feature_dir = feature_dirs[0]
     all_epochs = sorted([
         int(f.stem.replace("epoch_", ""))
